@@ -57,7 +57,7 @@ var completeEditTask = function(taskName, taskType, taskId)   {
               tasks[i].type = taskType;
             }
           }
-
+          saveTasks();
         alert("Task Updated");
         //reset form fields to blank and change button back to add task
         formEl.removeAttribute("data-task-id");
@@ -66,9 +66,6 @@ var completeEditTask = function(taskName, taskType, taskId)   {
 
     
 var createTaskEl = function (taskDataObj) {
-    console.log(taskDataObj);
-    console.log(taskDataObj.status);
-
         // create list item
         var listItemEl = document.createElement("li");
         listItemEl.className = "task-item";
@@ -91,7 +88,7 @@ var createTaskEl = function (taskDataObj) {
         taskDataObj.id = taskIdCounter;
 
         tasks.push(taskDataObj);
-        
+        saveTasks();
 
         //increase or increment taskIdCount
         taskIdCounter++;
@@ -184,6 +181,20 @@ var deleteTask = function(taskId) {
             var taskId= event.target.getAttribute("data-task-id");
             deleteTask(taskId);
           }
+        // create new array to hold updated list of tasks
+        var updatedTaskArr = [];
+
+        // loop through current tasks
+        for (var i = 0; i < tasks.length; i++) {
+        // if tasks[i].id doesn't match the value of taskId, let's keep that task and push it into the new array
+        if (tasks[i].id !== parseInt(taskId)) {
+            updatedTaskArr.push(tasks[i]);
+            }
+        }
+
+        // reassign tasks array to be the same as updatedTaskArr
+        tasks = updatedTaskArr;
+        saveTasks();
     };
 
 var taskStatusChangeHandler = function(event) {
@@ -209,12 +220,17 @@ var taskStatusChangeHandler = function(event) {
 
   // update task's in tasks array
     for (i = 0; i < tasks.length; i++) {
-        console.log(tasks);
+        
     if (tasks[i].id === parseInt(taskId)) {
       tasks[i].status = statusValue;
     }
   }
+  saveTasks();
 };
+
+var saveTasks = function()  {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
     //listens for clicks in the main section
       pageContentEl.addEventListener("click", taskButtonHandler);
